@@ -1,2 +1,6 @@
 [MESSAGES CONTROL]
-disable=no-value-for-parameter
+disable=
+    no-value-for-parameter,
+    missing-module-docstring
+
+

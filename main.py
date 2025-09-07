@@ -24,6 +24,8 @@ def load_embeddings_and_index():
     return None, None, None
 
 def main():
+    """Main function to perform vector search using FAISS and SentenceTransformer."""
+
     print("\n\n=========== Vector Search using FAISS ===========\n")
 
     # Initialize SentenceTransformer model
@@ -38,32 +40,32 @@ def main():
             # People & Family
             "kid", "parent", "mother", "father", "child", "son", "daughter", "aunt", "uncle", "grandparent",
             "brother", "sister", "family", "friend", "cousin", "infant", "toddler",
-            
+
             # Vehicles & Transportation
             "car", "bus", "bicycle", "airplane", "motorcycle", "train", "truck", "van", "scooter",
-            
+
             # Car Brands (expanded)
             "nissan", "toyota", "honda", "ford", "chevrolet", "bmw", "mercedes", "audi", "tesla",
-            
+
             # Generic Vehicle Terms
             "vehicle", "automobile", "transportation",
-            
+
             # Names (expanded)
             "Habib", "Amiya", "Riya", "Ankita", "Sarah", "John", "Maria", "David",
-            
+
             # Concepts
             "relationship", "bond", "journey", "travel", "engine", "wheel", "road"
         ]
         embeddings = model.encode(texts)
-        
+
         # Normalize embeddings to use with L2 for cosine similarity
         embeddings = embeddings / np.linalg.norm(embeddings, axis=1, keepdims=True)
         dimension = embeddings.shape[1]
-        
+
         # Use a flat L2 index, which now effectively performs a cosine search
         index = faiss.IndexFlatL2(dimension)
         index.add(embeddings.astype('float32'))
-        
+
         # Save the normalized embeddings and the new index
         save_embeddings_and_index(embeddings, texts, index)
         print("\nComputed and saved embeddings and index.")
@@ -80,10 +82,11 @@ def main():
 
         # Query search
         query_embedding = model.encode(user_input)
-        
+
         # Normalize the query embedding as well
         query_embedding = query_embedding / np.linalg.norm(query_embedding)
-        
+
+        # pylint: disable=invalid-name
         D, I = index.search(np.array([query_embedding]).astype('float32'), k=5)
 
         print("\nQuery:", user_input)
@@ -91,7 +94,7 @@ def main():
         # The distances (D) are now L2 distances, not cosine similarity scores
         # You can convert them back to cosine scores if needed: score = 1 - D^2 / 2
         print("Distances (L2):", D[0])
-        
+
 
 if __name__ == "__main__":
     main()
